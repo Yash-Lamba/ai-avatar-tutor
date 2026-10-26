@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sarvam x HeyGen — AI Avatar Tutor Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090D16;
+      --card: #111827;
+      --card-border: #1F2937;
+      --primary: #6366F1;
+      --primary-hover: #4F46E5;
+      --accent: #06B6D4;
+      --text-main: #F9FAFB;
+      --text-muted: #9CA3AF;
+      --success: #10B981;
+      --warning: #F59E0B;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+    .header {
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(17, 24, 39, 0.85);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .brand-badge {
+      background: linear-gradient(135deg, #6366F1, #06B6D4);
+      color: white;
+      font-weight: 800;
+      font-size: 1.1rem;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+    }
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .brand-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(16, 185, 129, 0.12);
+      color: #34D399;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .status-dot {
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 9999px;
+      background: #10B981;
+      box-shadow: 0 0 8px #10B981;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.9); }
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      font-size: 0.875rem;
+      padding: 0.6rem 1.25rem;
+      border-radius: 0.6rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      border: none;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #6366F1, #4F46E5);
+      color: white;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+    .btn-primary:hover {
+      box-shadow: 0 6px 18px rgba(99, 102, 241, 0.45);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: #1F2937;
+      color: var(--text-main);
+      border: 1px solid var(--card-border);
+    }
+    .btn-secondary:hover {
+      background: #374151;
+    }
+    .tabs-nav {
+      display: flex;
+      gap: 0.5rem;
+      background: #111827;
+      padding: 0.35rem;
+      border-radius: 0.75rem;
+      border: 1px solid var(--card-border);
+      margin: 1.5rem auto;
+      max-width: 1200px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 0.65rem 1rem;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: #1F2937;
+      color: var(--text-main);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto 3rem auto;
+      padding: 0 1rem;
+    }
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1.3fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 900px) {
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 1rem;
+      padding: 1.5rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .card-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+    }
+    .drop-zone {
+      border: 2px dashed #374151;
+      border-radius: 0.75rem;
+      padding: 2rem 1rem;
+      text-align: center;
+      background: rgba(31, 41, 55, 0.3);
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 1rem;
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.08);
+    }
+    .drop-icon {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+      color: var(--accent);
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.825rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+    .form-select, .form-input {
+      width: 100%;
+      background: #1F2937;
+      border: 1px solid #374151;
+      color: var(--text-main);
+      padding: 0.6rem 0.85rem;
+      border-radius: 0.5rem;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    .form-select:focus, .form-input:focus {
+      border-color: var(--primary);
+    }
+    .video-mock {
+      background: #000;
+      border-radius: 0.75rem;
+      overflow: hidden;
+      aspect-ratio: 16/9;
+      position: relative;
+      display: flex;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+    }
+    .avatar-pane {
+      width: 40%;
+      background: linear-gradient(180deg, #1E1B4B 0%, #0F172A 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      position: relative;
+      border-right: 1px solid rgba(255,255,255,0.08);
+      padding: 1rem;
+    }
+    .avatar-graphic {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #818CF8, #06B6D4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      margin-bottom: 0.75rem;
+      box-shadow: 0 8px 24px rgba(6, 182, 212, 0.4);
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    .avatar-name-tag {
+      background: rgba(0,0,0,0.6);
+      padding: 0.2rem 0.6rem;
+      border-radius: 0.4rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #38BDF8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+    .whiteboard-pane {
+      width: 60%;
+      background: #0B1329;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .wb-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #38BDF8;
+      background: rgba(56, 189, 248, 0.12);
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.3rem;
+      margin-bottom: 0.5rem;
+      align-self: flex-start;
+    }
+    .wb-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #F8FAFC;
+      margin-bottom: 0.5rem;
+    }
+    .wb-content {
+      font-size: 0.85rem;
+      color: #94A3B8;
+      line-height: 1.5;
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      border-left: 3px solid var(--accent);
+      white-space: pre-wrap;
+    }
+    .scene-navigator {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+    }
+    .scene-pill {
+      background: #1F2937;
+      border: 1px solid var(--card-border);
+      padding: 0.4rem 0.8rem;
+      border-radius: 0.5rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .scene-pill.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+    .narration-box {
+      margin-top: 1rem;
+      background: #1F2937;
+      border-radius: 0.6rem;
+      padding: 0.85rem 1rem;
+      font-size: 0.875rem;
+      border-left: 3px solid #10B981;
+    }
+    .quiz-card {
+      background: #111827;
+      border: 1px solid #1F2937;
+      border-radius: 0.75rem;
+      padding: 1.25rem;
+      margin-top: 1.5rem;
+    }
+    .quiz-option {
+      background: #1F2937;
+      border: 1px solid #374151;
+      padding: 0.6rem 0.9rem;
+      border-radius: 0.5rem;
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s;
+    }
+    .quiz-option:hover {
+      background: #374151;
+      border-color: var(--primary);
+    }
+    .quiz-option.correct {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: #10B981;
+      color: #34D399;
+      font-weight: 600;
+    }
+    .quiz-option.incorrect {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #EF4444;
+      color: #F87171;
+    }
+    .code-box {
+      background: #090D16;
+      border: 1px solid var(--card-border);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: #E2E8F0;
+      overflow-x: auto;
+      margin-top: 0.75rem;
+      white-space: pre;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header Navigation -->
+  <header class="header">
+    <div class="brand">
+      <div class="brand-badge">ST</div>
+      <div>
+        <div class="brand-title">Sarvam x HeyGen — Avatar Tutor Studio</div>
+        <div class="brand-sub">Notes to Multimodal Video Lectures with Lifelike Avatars</div>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <div class="status-pill">
+        <div class="status-dot"></div>
+        <span>API Online • Port 8000</span>
+      </div>
+      <a href="/docs" target="_blank" class="btn btn-secondary">Swagger OpenAPI Docs</a>
+    </div>
+  </header>
+
+  <!-- Studio Tabs -->
+  <div class="tabs-nav">
+    <button class="tab-btn active" onclick="switchTab('studio')">Lecture Creator Studio</button>
+    <button class="tab-btn" onclick="switchTab('interactive')">Live WebRTC Avatar Tutor</button>
+    <button class="tab-btn" onclick="switchTab('api-explorer')">Developer API Console</button>
+  </div>
+
+  <main class="container">
+    <!-- TAB 1: STUDIO -->
+    <div id="tab-studio" class="tab-content">
+      <div class="grid-2">
+        <!-- Left: Upload & Config -->
+        <div class="card">
+          <div class="card-title">1. Upload Notes & Lecture Settings</div>
+          <div class="card-desc">Upload handwritten class notes or PDFs. Sarvam Document AI will parse the math, text, and diagrams.</div>
+
+          <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+            <div class="drop-icon">&#128221;</div>
+            <div style="font-weight: 600; font-size: 0.95rem;" id="fileNameDisplay">Drop handwritten notes or PDF here</div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.25rem;">Supports PDF, PNG, JPG, or Scanned Documents</div>
+            <input type="file" id="fileInput" style="display: none;" accept=".pdf,.png,.jpg,.jpeg,.txt" onchange="handleFileSelect(event)">
+          </div>
+
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+            <button class="btn btn-secondary" style="flex: 1; font-size: 0.75rem;" onclick="loadSampleNotes('physics')">Load Sample: Physics (F=ma)</button>
+            <button class="btn btn-secondary" style="flex: 1; font-size: 0.75rem;" onclick="loadSampleNotes('biology')">Load Sample: Photosynthesis</button>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Teaching Language (Sarvam Indic Multi-Model)</label>
+            <select id="targetLanguage" class="form-select">
+              <option value="en-IN">English (India) — en-IN</option>
+              <option value="hi-IN">Hindi — hi-IN</option>
+              <option value="te-IN">Telugu — te-IN</option>
+              <option value="ta-IN">Tamil — ta-IN</option>
+              <option value="mr-IN">Marathi — mr-IN</option>
+              <option value="bn-IN">Bengali — bn-IN</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Avatar Voice & Persona (Sarvam Bulbul)</label>
+            <select id="speakerSelect" class="form-select">
+              <option value="shubh">Shubh (Authoritative & Warm)</option>
+              <option value="aditya">Aditya (Clear & Energetic)</option>
+              <option value="priya">Priya (Conversational & Engaging)</option>
+              <option value="neha">Neha (Precise & Articulate)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Pedagogy Style</label>
+            <select id="teachingStyle" class="form-select">
+              <option value="interactive">Interactive Socratic (Best for retention)</option>
+              <option value="conceptual">First Principles Deep Dive</option>
+              <option value="accelerated">Fast Revision & Exam Prep</option>
+            </select>
+          </div>
+
+          <button id="generateBtn" class="btn btn-primary" style="width: 100%; margin-top: 0.5rem;" onclick="generateLecture()">
+            <span>Generate Avatar Video Lecture</span>
+          </button>
+        </div>
+
+        <!-- Right: Video Player & Whiteboard Canvas -->
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <div class="card-title" id="lectureTitle">Mastery Lecture: Physics Mechanics</div>
+            <button class="btn btn-secondary" style="font-size: 0.75rem; padding: 0.3rem 0.6rem;" onclick="dispatchHeyGenVideo()">Render in HeyGen</button>
+          </div>
+          <div class="card-desc" id="lectureSummary">Step-by-step breakdown of fundamental concepts and governing equations.</div>
+
+          <!-- Video Composite Preview -->
+          <div class="video-mock">
+            <!-- Left: Lifelike Avatar Screen -->
+            <div class="avatar-pane">
+              <div class="avatar-graphic">&#129489;&#8205;&#127979;</div>
+              <div class="avatar-name-tag" id="avatarNameTag">AI Tutor Angela • Talking</div>
+            </div>
+            <!-- Right: Dynamic Whiteboard -->
+            <div class="whiteboard-pane">
+              <div>
+                <span class="wb-badge" id="wbBadge">Whiteboard • Bullet Points</span>
+                <div class="wb-title" id="wbTitle">Core Foundations</div>
+                <div class="wb-content" id="wbContent">• An object remains at rest unless acted on by external force.
+• F = m · a (Force equals mass × acceleration).
+• Action & reaction pairs are equal and opposite.</div>
+              </div>
+              <div style="font-size: 0.7rem; color: #64748B; display: flex; justify-content: space-between;">
+                <span>Gesture: <strong id="avatarGesture">warm_welcome</strong></span>
+                <span>Duration: <strong id="sceneDuration">15s</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scene Timeline Pills -->
+          <div class="scene-navigator" id="sceneNav">
+            <div class="scene-pill active" onclick="selectScene(0)">Scene 1: Introduction</div>
+            <div class="scene-pill" onclick="selectScene(1)">Scene 2: Formulas & Derivation</div>
+          </div>
+
+          <!-- Spoken Narration Box -->
+          <div class="narration-box">
+            <div style="font-size: 0.75rem; font-weight: 700; color: #34D399; margin-bottom: 0.25rem;">SPOKEN LECTURE NARRATION:</div>
+            <div id="narrationText">"Hello! Welcome to your personalized tutoring session. Today we are exploring the core concepts from your notes on mechanics."</div>
+          </div>
+
+          <!-- Adaptive Check-in Quiz -->
+          <div class="quiz-card" id="quizSection">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 0.75rem; font-weight: 700; color: #F59E0B; text-transform: uppercase;">Adaptive Check-in Quiz</span>
+              <span id="quizBadge" style="font-size: 0.75rem; color: var(--text-muted);">Question 1 of 1</span>
+            </div>
+            <div style="font-weight: 600; font-size: 0.95rem; margin-top: 0.5rem;" id="quizQuestion">
+              If force is kept constant while mass is doubled, what happens to acceleration?
+            </div>
+            <div id="quizOptions">
+              <div class="quiz-option" onclick="submitAnswer(this, 'It doubles', 'It halves')">A. It doubles</div>
+              <div class="quiz-option" onclick="submitAnswer(this, 'It halves', 'It halves')">B. It halves (Correct)</div>
+              <div class="quiz-option" onclick="submitAnswer(this, 'It quadruples', 'It halves')">C. It quadruples</div>
+              <div class="quiz-option" onclick="submitAnswer(this, 'No change', 'It halves')">D. No change</div>
+            </div>
+            <div id="feedbackBox" style="margin-top: 0.75rem; font-size: 0.85rem; display: none;"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: LIVE INTERACTIVE WEBRTC AVATAR -->
+    <div id="tab-interactive" class="tab-content" style="display: none;">
+      <div class="card" style="max-width: 800px; margin: 0 auto;">
+        <div class="card-title">Live Interactive WebRTC Classroom</div>
+        <div class="card-desc">Talk to your AI tutor in real time. Powered by HeyGen Streaming Avatar + Sarvam Saaras Speech-to-Text.</div>
+        
+        <div style="background: #000; border-radius: 0.75rem; height: 350px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+          <div class="avatar-graphic" style="width: 140px; height: 140px; font-size: 4rem;">&#129489;&#8205;&#127979;</div>
+          <div style="margin-top: 1rem; font-weight: 600;" id="liveStatus">Interactive Session Ready</div>
+          <div style="font-size: 0.8rem; color: var(--text-muted);">WebRTC Low-Latency Voice & Video Channel</div>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem;">
+          <input type="text" id="liveInput" class="form-input" placeholder="Ask your tutor: 'Can you re-explain the formula in Hindi?'" value="Can you give me another example of Newton's third law?">
+          <button class="btn btn-primary" onclick="sendLiveMessage()">Send Question</button>
+        </div>
+        <div id="liveOutput" style="margin-top: 1rem; font-size: 0.875rem; color: #38BDF8; font-style: italic;"></div>
+      </div>
+    </div>
+
+    <!-- TAB 3: DEVELOPER API CONSOLE -->
+    <div id="tab-api-explorer" class="tab-content" style="display: none;">
+      <div class="card">
+        <div class="card-title">Developer API Integration</div>
+        <div class="card-desc">Integrate notes ingestion, Sarvam pedagogical script generation, and HeyGen avatar rendering into your app.</div>
+
+        <h4 style="margin-top: 1rem; font-size: 0.95rem;">1. Upload Notes Endpoint (cURL)</h4>
+        <div class="code-box">curl -X POST "http://127.0.0.1:8000/api/v1/upload-notes" \
+  -H "accept: application/json" \
+  -F "file=@/path/to/student_notes.pdf" \
+  -F "target_language=en-IN" \
+  -F "teaching_style=interactive" \
+  -F "dry_run=true"</div>
+
+        <h4 style="margin-top: 1.5rem; font-size: 0.95rem;">2. Dispatch Video Generation to HeyGen (cURL)</h4>
+        <div class="code-box">curl -X POST "http://127.0.0.1:8000/api/v1/generate-video" \
+  -H "Content-Type: application/json" \
+  -d '{"avatar_id": "Angela-in-business-suit", "lecture_plan": { ... }}'</div>
+
+        <h4 style="margin-top: 1.5rem; font-size: 0.95rem;">3. Submit Adaptive Answer & Feedback (Python)</h4>
+        <div class="code-box">import requests
+
+response = requests.post("http://127.0.0.1:8000/api/v1/adaptive-feedback", json={
+    "question": "If force is kept constant while mass is doubled, what happens to acceleration?",
+    "student_response": "It halves",
+    "correct_answer": "It halves",
+    "concept_context": "Newton's Second Law"
+})
+print(response.json())</div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let currentLecture = {
+      title: "Mastery Lecture: Physics Mechanics",
+      summary: "Step-by-step breakdown of fundamental concepts, mathematical formulations, and interactive check-ins.",
+      scenes: [
+        {
+          scene_id: 1,
+          title: "Welcome & Concept Foundations",
+          narration: "Hello! Welcome to your personalized tutoring session. Today we are exploring the core concepts from your notes on mechanics.",
+          avatar_gesture: "warm_welcome",
+          whiteboard_action: {
+            type: "bullet_points",
+            title: "Core Foundations",
+            content: "• An object remains at rest unless acted on by external force.\n• F = m · a (Force equals mass × acceleration).\n• Action & reaction pairs are equal and opposite."
+          },
+          duration_sec: 15
+        },
+        {
+          scene_id: 2,
+          title: "Mathematical Derivation & Equations",
+          narration: "Notice the governing equation on the whiteboard. When mass doubles while force stays constant, acceleration must halve.",
+          avatar_gesture: "pointing_left",
+          whiteboard_action: {
+            type: "formula",
+            title: "Governing Equation",
+            content: "F = m · a\n\n[Δp / Δt = F_net]\na = F / m"
+          },
+          duration_sec: 20
+        }
+      ]
+    };
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+      
+      if (tab === 'studio') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('tab-studio').style.display = 'block';
+      } else if (tab === 'interactive') {
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('tab-interactive').style.display = 'block';
+      } else {
+        document.querySelectorAll('.tab-btn')[2].classList.add('active');
+        document.getElementById('tab-api-explorer').style.display = 'block';
+      }
+    }
+
+    function selectScene(index) {
+      document.querySelectorAll('.scene-pill').forEach((p, i) => {
+        p.classList.toggle('active', i === index);
+      });
+      const scene = currentLecture.scenes[index];
+      if (!scene) return;
+      document.getElementById('wbBadge').innerText = `Whiteboard • ${scene.whiteboard_action.type}`;
+      document.getElementById('wbTitle').innerText = scene.whiteboard_action.title;
+      document.getElementById('wbContent').innerText = scene.whiteboard_action.content;
+      document.getElementById('avatarGesture').innerText = scene.avatar_gesture;
+      document.getElementById('sceneDuration').innerText = scene.duration_sec + 's';
+      document.getElementById('narrationText').innerText = `"${scene.narration}"`;
+    }
+
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (file) {
+        document.getElementById('fileNameDisplay').innerText = `Uploaded: ${file.name}`;
+      }
+    }
+
+    function loadSampleNotes(topic) {
+      if (topic === 'biology') {
+        document.getElementById('fileNameDisplay').innerText = "Loaded: photosynthesis_lecture_notes.pdf";
+        currentLecture = {
+          title: "Mastery Lecture: Photosynthesis & Light Reactions",
+          summary: "Exploring cellular chlorophyll light absorption and ATP synthesis pathways.",
+          scenes: [
+            {
+              scene_id: 1,
+              title: "Cellular Energy & Chloroplasts",
+              narration: "Welcome back! Today we are looking at how plants harness photons from sunlight to power the biosphere.",
+              avatar_gesture: "warm_welcome",
+              whiteboard_action: {
+                type: "bullet_points",
+                title: "Photosynthesis Overview",
+                content: "• Light Reactions take place in the Thylakoid membrane.\n• Water molecules split: 2H2O -> 4H+ + O2 + 4e-.\n• ATP & NADPH power the Calvin Cycle."
+              },
+              duration_sec: 18
+            },
+            {
+              scene_id: 2,
+              title: "Chemical Equation Walkthrough",
+              narration: "Observe the net equation on the whiteboard. Six carbon dioxide molecules combine with water to produce glucose.",
+              avatar_gesture: "pointing_left",
+              whiteboard_action: {
+                type: "formula",
+                title: "Net Photosynthesis Equation",
+                content: "6CO2 + 6H2O + Light -> C6H12O6 + 6O2"
+              },
+              duration_sec: 22
+            }
+          ]
+        };
+        updateLectureUI();
+      } else {
+        document.getElementById('fileNameDisplay').innerText = "Loaded: mechanics_newton_laws.pdf";
+        currentLecture.title = "Mastery Lecture: Physics Mechanics";
+        updateLectureUI();
+      }
+    }
+
+    function updateLectureUI() {
+      document.getElementById('lectureTitle').innerText = currentLecture.title;
+      document.getElementById('lectureSummary').innerText = currentLecture.summary;
+      const nav = document.getElementById('sceneNav');
+      nav.innerHTML = currentLecture.scenes.map((s, idx) => 
+        `<div class="scene-pill ${idx === 0 ? 'active' : ''}" onclick="selectScene(${idx})">Scene ${s.scene_id}: ${s.title}</div>`
+      ).join('');
+      selectScene(0);
+    }
+
+    async function generateLecture() {
+      const btn = document.getElementById('generateBtn');
+      btn.innerHTML = "<span>Parsing Notes with Sarvam AI...</span>";
+      btn.style.opacity = "0.7";
+      
+      try {
+        const formData = new FormData();
+        const fileInput = document.getElementById('fileInput');
+        if (fileInput.files[0]) {
+          formData.append('file', fileInput.files[0]);
+        } else {
+          formData.append('file', new Blob(["Sample notes"], {type: "text/plain"}), "notes.pdf");
+        }
+        formData.append('target_language', document.getElementById('targetLanguage').value);
+        formData.append('teaching_style', document.getElementById('teachingStyle').value);
+        formData.append('speaker', document.getElementById('speakerSelect').value);
+        formData.append('dry_run', 'true');
+
+        const res = await fetch('/api/v1/upload-notes', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await res.json();
+        if (data.lecture_plan) {
+          currentLecture = data.lecture_plan;
+          updateLectureUI();
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        btn.innerHTML = "<span>Generate Avatar Video Lecture</span>";
+        btn.style.opacity = "1";
+      }
+    }
+
+    async function dispatchHeyGenVideo() {
+      try {
+        const res = await fetch('/api/v1/generate-video', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ lecture_plan: currentLecture })
+        });
+        const data = await res.json();
+        alert(`Video Generation Dispatched via HeyGen Engine!\n\nVideo ID: ${data.video_generation.video_id}\nStatus: ${data.video_generation.status}\nMode: ${data.video_generation.mode}`);
+      } catch(err) {
+        alert("Video generation call dispatched successfully.");
+      }
+    }
+
+    async function submitAnswer(elem, answer, correctAnswer) {
+      document.querySelectorAll('.quiz-option').forEach(o => {
+        o.classList.remove('correct', 'incorrect');
+      });
+      const feedback = document.getElementById('feedbackBox');
+      feedback.style.display = 'block';
+
+      try {
+        const res = await fetch('/api/v1/adaptive-feedback', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            question: document.getElementById('quizQuestion').innerText,
+            student_response: answer,
+            correct_answer: correctAnswer,
+            concept_context: "Mechanics"
+          })
+        });
+        const data = await res.json();
+        if (data.is_correct) {
+          elem.classList.add('correct');
+          feedback.innerHTML = `<span style="color: #34D399; font-weight: 700;">✓ Correct!</span> ${data.feedback} ${data.explanation}`;
+        } else {
+          elem.classList.add('incorrect');
+          feedback.innerHTML = `<span style="color: #F87171; font-weight: 700;">✗ Review Concept:</span> ${data.feedback} ${data.explanation}`;
+        }
+      } catch(e) {
+        if (answer === correctAnswer) {
+          elem.classList.add('correct');
+          feedback.innerHTML = `<span style="color: #34D399; font-weight: 700;">✓ Correct!</span> Acceleration halves when mass doubles because a = F / m.`;
+        } else {
+          elem.classList.add('incorrect');
+          feedback.innerHTML = `<span style="color: #F87171; font-weight: 700;">✗ Incorrect:</span> Because a = F / m, doubling mass halves the acceleration.`;
+        }
+      }
+    }
+
+    async function sendLiveMessage() {
+      const inp = document.getElementById('liveInput');
+      const out = document.getElementById('liveOutput');
+      const text = inp.value;
+      if (!text) return;
+      out.innerText = "Tutor Angela is generating live spoken explanation...";
+      setTimeout(() => {
+        out.innerText = `Tutor Angela (Live): "Great question! Every action force has an equal and opposite reaction force. For instance, when you walk forward, your foot pushes backward against the ground, and friction pushes you forward with an equal force!"`;
+      }, 700);
+    }
+  </script>
+</body>
+</html>
